@@ -28,7 +28,7 @@ class UrlShortener:
         self.base_url = "http://localhost:8000/"
 
     def shorten_url(self, original_url):
-        hash_value = hashlib.md5(original_url.encode()).hexdigest()[:6]
+        hash_value = hashlib.md5(original_url.encode()).hexdigest()[-6:]
         short_url = self.base_url + hash_value
         self.url_mapping[short_url] = original_url
         parsed = urlparse(original_url)
@@ -39,7 +39,7 @@ class UrlShortener:
             cursor.execute("insert into shorted_urls (shorted_url, original_url, domain) values (?, ?, ?)",
             (short_url, original_url, domain))
         except:
-            print("Already inserted")
+            print("Already Exists")
         conn.commit()
         return short_url
 
