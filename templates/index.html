@@ -60,6 +60,7 @@
             if (xhr.readyState === 4) {
               dt = JSON.parse(xhr.response)
                 if(id==='metrics'){
+                  document.getElementById('metric-data').innerHTML = '';
                   for(data in dt){
                     document.getElementById('metric-data').innerHTML += '<p>'+data +":"+ dt[data]+'</p>'
                   }
