@@ -1,6 +1,6 @@
 import hashlib
 import sqlite3
-from urllib.parse import urlparse
+import tldextract
 import tornado.ioloop
 import tornado.web
 
@@ -35,9 +35,8 @@ class UrlShortener(tornado.web.RequestHandler):
 
         hash_value = hashlib.md5(self.original_url.encode()).hexdigest()[-6:]
         short_url = self.base_url + hash_value
-
-        parsed = urlparse(self.original_url)
-        domain = parsed.netloc
+        parsed = tldextract.extract(self.original_url)
+        domain = parsed.domain
         conn = sqlite3.connect('urls.db') 
         cursor = conn.cursor() 
         try:
@@ -61,12 +60,24 @@ class ShortedUrl(tornado.web.RequestHandler):
         conn.commit() 
         conn.close() 
         self.redirect(original)
-
+class Metrics(tornado.web.RequestHandler):
+    def get(self):
+        top_domain = {}
+        conn = sqlite3.connect('urls.db') 
+        cursor = conn.cursor() 
+        cursor.execute("SELECT domain, COUNT(domain) as c FROM shorted_urls group by domain ORDER BY c DESC limit 3") 
+        try:
+            original = cursor.fetchall()
+            for row in original:
+                top_domain[row[0]] = row[1]
+        except:
+            raise tornado.web.HTTPError(404)
+        self.write(top_domain)
 def make_app():
-    return tornado.web.Application([(r"/", MainHandler),(r"/urls",UrlShortener ),(r"/([^/]+)", ShortedUrl)])
+    return tornado.web.Application([(r"/", MainHandler),(r"/urls",UrlShortener ),(r"/metrics",Metrics ),(r"/([^/]+)", ShortedUrl)])
  
 if __name__ == "__main__":
     app = make_app()
     app.listen(8000)
-    tornado.ioloop.IOLoop.current().start()
     print('server is running on 8000')
+    tornado.ioloop.IOLoop.current().start()
