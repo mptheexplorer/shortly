@@ -14,3 +14,8 @@ you will recieve a shorted url. if you will click on the url it will redirect yo
 # For checking the most shorted urls go to the below url
 
 http://localhost:8000/metrics
+
+# Go to Home page
+http://localhost:8000
+
+From here you can do all the above tasks

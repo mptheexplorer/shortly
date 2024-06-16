@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8">
+	<title>Shortly API</title>
+	<style>
+		a{
+			text-decoration: none;
+
+		}
+.btn{
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  background-color: white; 
+  color: black; 
+  border: 2px solid #008CBA;
+}
+.btn1{
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+	</style>
+</head>
+<body>
+	<div class="btn1">
+		<input class="btn" type="submit" value="Get Metrics" onclick="submit('metrics')">
+  </div>
+  <div class="btn1">
+<input type="url" id="url" style="width: 400px;"/>
+		<input class="btn" type="submit" value="Short url" onclick="shorturl()">
+  </div>
+  <div class="btn1"><span id="shorted"></span></div>
+  <div id="metric-data"></div>
+	
+	<script type="text/javascript">
+    function shorturl(){
+      id = document.getElementById('url').value;
+      var xhr1 = new XMLHttpRequest();
+        xhr1.onreadystatechange = function () {
+            if (xhr1.readyState === 4) {
+              dt = xhr1.response
+              document.getElementById('shorted').innerHTML = dt    
+            }
+        }
+        xhr1.open('get', '/urls?url='+id, true);
+        xhr1.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        xhr1.send();
+    }
+
+    function submit(id) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+              dt = JSON.parse(xhr.response)
+                if(id==='metrics'){
+                  for(data in dt){
+                    document.getElementById('metric-data').innerHTML += '<p>'+data +":"+ dt[data]+'</p>'
+                  }
+                  
+                }
+                
+            }
+        }
+        if(id==='metrics'){
+        xhr.open('get', '/'+id, true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        xhr.send();
+        }
+    }
+
+	</script>
+	</body>
+	</html>

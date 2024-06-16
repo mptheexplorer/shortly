@@ -3,6 +3,7 @@ import sqlite3
 import tldextract
 import tornado.ioloop
 import tornado.web
+import os
 
 def create_table():
     sql_statements = """CREATE TABLE IF NOT EXISTS shorted_urls (
@@ -26,7 +27,7 @@ create_table()
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write("http://localhost:8000/urls?url= ")
+        self.render('index.html')
 class UrlShortener(tornado.web.RequestHandler):
 
     def get(self):
@@ -45,7 +46,7 @@ class UrlShortener(tornado.web.RequestHandler):
         except:
             pass
         conn.commit()
-        self.write('<a href = '+short_url+'>'+short_url+'</a>')
+        self.write('<a href = '+short_url+' target="_blank">'+short_url+'</a>')
 
 class ShortedUrl(tornado.web.RequestHandler):
     def get(self,slug):
@@ -74,7 +75,7 @@ class Metrics(tornado.web.RequestHandler):
             raise tornado.web.HTTPError(404)
         self.write(top_domain)
 def make_app():
-    return tornado.web.Application([(r"/", MainHandler),(r"/urls",UrlShortener ),(r"/metrics",Metrics ),(r"/([^/]+)", ShortedUrl)])
+    return tornado.web.Application([(r"/", MainHandler),(r"/urls",UrlShortener ),(r"/metrics",Metrics ),(r"/([^/]+)", ShortedUrl)],template_path=os.path.join(os.path.dirname(__file__), "templates"))
  
 if __name__ == "__main__":
     app = make_app()
